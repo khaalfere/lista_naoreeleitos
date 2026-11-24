@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123c73">
+  <title>Consulta de Gabinetes — Câmara dos Deputados</title>
+  <style>
+    :root {
+      --navy: #123c73;
+      --blue: #1d5ca8;
+      --blue-2: #eaf3ff;
+      --blue-3: #f5f9ff;
+      --ink: #172b45;
+      --muted: #60738c;
+      --line: #dce6f2;
+      --white: #fff;
+      --green: #16794b;
+      --amber: #966000;
+      --shadow: 0 12px 32px rgba(22, 54, 92, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f8fd; color: var(--ink); }
+    a { color: var(--blue); }
+    .topbar { height: 8px; background: linear-gradient(90deg, #123c73, #2d78c7, #86b7ed); }
+    .wrap { width: min(1220px, calc(100% - 36px)); margin: 0 auto; }
+    header { padding: 34px 0 26px; background: var(--white); border-bottom: 1px solid var(--line); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--blue); background: var(--blue-2); border: 1px solid #d5e7fb; border-radius: 999px; padding: 7px 12px; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { margin: 16px 0 8px; color: var(--navy); font-size: clamp(28px, 4vw, 42px); line-height: 1.08; letter-spacing: -.035em; }
+    .subtitle { max-width: 760px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    main { padding: 25px 0 52px; }
+    .notice { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin-bottom: 20px; border: 1px solid #d7e7f8; border-radius: 13px; background: #f0f7ff; color: #34516f; font-size: 13px; line-height: 1.55; }
+    .notice strong { color: var(--navy); }
+    .notice-icon { flex: 0 0 23px; width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: #d9eaff; color: var(--blue); font-weight: 900; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 0 0 20px; }
+    .stat { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: 0 3px 12px rgba(20, 54, 95, .025); }
+    .stat .num { display: block; color: var(--navy); font-size: 25px; line-height: 1.2; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stat .label { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .panel { overflow: hidden; background: var(--white); border: 1px solid var(--line); border-radius: 17px; box-shadow: var(--shadow); }
+    .toolbar { display: grid; grid-template-columns: minmax(240px, 1.6fr) minmax(130px, .7fr) minmax(145px, .8fr) auto; gap: 10px; padding: 17px; border-bottom: 1px solid var(--line); }
+    .field { width: 100%; min-height: 43px; padding: 10px 12px; color: var(--ink); background: #fbfdff; border: 1px solid #cedbea; border-radius: 10px; outline: none; font: inherit; font-size: 13px; }
+    .field:focus { border-color: #5b99d8; box-shadow: 0 0 0 3px rgba(43, 119, 195, .12); }
+    .btn { min-height: 43px; border: 1px solid var(--blue); border-radius: 10px; padding: 0 15px; background: var(--blue); color: white; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: .15s ease; }
+    .btn:hover { background: var(--navy); border-color: var(--navy); }
+    .btn.secondary { color: var(--blue); background: white; border-color: #c6d9ed; }
+    .btn.secondary:hover { background: var(--blue-3); }
+    .toolbar-actions { display: flex; gap: 8px; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; min-width: 900px; border-collapse: collapse; }
+    thead th { padding: 12px 13px; text-align: left; color: #657b95; background: #f8fbff; border-bottom: 1px solid var(--line); font-size: 10px; text-transform: uppercase; letter-spacing: .075em; font-weight: 800; white-space: nowrap; }
+    tbody td { padding: 12px 13px; border-bottom: 1px solid #edf2f8; font-size: 13px; vertical-align: middle; }
+    tbody tr:hover { background: #f8fbff; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .person { display: flex; align-items: center; gap: 11px; min-width: 210px; }
+    .avatar { width: 43px; height: 43px; flex: 0 0 43px; object-fit: cover; object-position: center top; border-radius: 50%; border: 2px solid #e3edf8; background: #eaf2fb; }
+    .avatar-fallback { display: grid; place-items: center; color: var(--blue); font-size: 12px; font-weight: 800; }
+    .person-name { color: var(--navy); font-weight: 750; line-height: 1.25; }
+    .person-meta { margin-top: 3px; color: #7a8da3; font-size: 11px; }
+    .uf { display: inline-flex; min-width: 34px; justify-content: center; padding: 5px 7px; border: 1px solid #d9e7f6; border-radius: 7px; background: #f2f7fd; color: #345778; font-size: 11px; font-weight: 800; }
+    .party { color: #526b85; font-weight: 650; }
+    .office { color: var(--navy); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .subline { display: block; margin-top: 3px; color: #8191a4; font-size: 11px; font-weight: 500; }
+    .contact { color: #536d88; font-size: 12px; white-space: nowrap; }
+    .status { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 11px; font-weight: 750; white-space: nowrap; }
+    .status.pending { color: var(--amber); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .profile { display: inline-block; padding: 7px 10px; border: 1px solid #cbdced; border-radius: 8px; color: var(--blue); text-decoration: none; font-size: 11px; font-weight: 750; white-space: nowrap; }
+    .profile:hover { background: var(--blue-2); }
+    .empty { display: none; padding: 45px 20px; color: var(--muted); text-align: center; font-size: 14px; }
+    .loading { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
+    .load-dot { display: inline-block; width: 7px; height: 7px; margin: 0 3px; border-radius: 50%; background: #4f8dca; animation: pulse 1s infinite ease-in-out alternate; }
+    .load-dot:nth-child(2) { animation-delay: .2s; } .load-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { to { opacity: .25; transform: translateY(-3px); } }
+    .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding: 14px 17px; border-top: 1px solid var(--line); background: #fbfdff; color: #7b8da1; font-size: 11px; }
+    .foot a { font-weight: 700; text-decoration: none; }
+    .foot a:hover { text-decoration: underline; }
+    .error { display: none; padding: 13px 16px; color: #8a4d00; background: #fff8e9; border-bottom: 1px solid #f0dfbb; font-size: 12px; line-height: 1.5; }
+    .legend { margin: 14px 2px 0; color: #71839a; font-size: 11px; line-height: 1.55; }
+    @media (max-width: 850px) {
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .toolbar .search { grid-column: 1 / -1; }
+      .toolbar-actions { grid-column: 1 / -1; }
+      .toolbar-actions .btn { flex: 1; }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: min(100% - 22px, 1220px); }
+      header { padding: 26px 0 22px; }
+      .stats { gap: 8px; }
+      .stat { padding: 12px 10px; }
+      .stat .num { font-size: 21px; }
+      .stat .label { font-size: 10px; }
+      .toolbar { grid-template-columns: 1fr; padding: 12px; }
+      .toolbar .search, .toolbar-actions { grid-column: auto; }
+      .notice { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header>
+    <div class="wrap">
+      <span class="eyebrow">● Dados oficiais · Câmara dos Deputados</span>
+      <h1>Consulta de gabinetes</h1>
+      <p class="subtitle">Pesquise os parlamentares da lista, consulte gabinete, anexo, partido, telefone e foto oficial. Os dados cadastrais são carregados diretamente da API de Dados Abertos da Câmara.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="notice">
+      <span class="notice-icon">i</span>
+      <div><strong>Sobre esta base:</strong> os nomes abaixo reproduzem a lista preliminar consolidada na conversa. A condição de não reeleição ou de disputa por outro cargo não foi revalidada individualmente nesta aplicação. Gabinete, partido, UF, telefone e foto são preenchidos conforme o último cadastro disponível na API oficial; quando não houver correspondência segura, o sistema sinaliza a pendência em vez de inventar dados.</div>
+    </div>
+
+    <section class="stats" aria-label="Resumo da consulta">
+      <div class="stat"><span class="num" id="totalCount">—</span><span class="label">Nomes na lista</span></div>
+      <div class="stat"><span class="num" id="foundCount">—</span><span class="label">Cadastros localizados</span></div>
+      <div class="stat"><span class="num" id="pendingCount">—</span><span class="label">Pendentes de conferência</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <input id="search" class="field search" type="search" placeholder="Buscar por nome, partido, gabinete ou telefone…" aria-label="Buscar parlamentar">
+        <select id="stateFilter" class="field" aria-label="Filtrar por estado">
+          <option value="">Todas as UFs</option>
+        </select>
+        <select id="statusFilter" class="field" aria-label="Filtrar por situação do cadastro">
+          <option value="all">Todos os cadastros</option>
+          <option value="found">Localizados</option>
+          <option value="pending">Pendentes</option>
+        </select>
+        <div class="toolbar-actions">
+          <button id="refreshBtn" class="btn" type="button">Atualizar dados</button>
+          <button id="csvBtn" class="btn secondary" type="button">Exportar CSV</button>
+        </div>
+      </div>
+      <div id="errorBox" class="error"></div>
+      <div id="loading" class="loading">Consultando a base oficial da Câmara <span class="load-dot"></span><span class="load-dot"></span><span class="load-dot"></span></div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Parlamentar</th><th>UF</th><th>Partido</th><th>Gabinete</th><th>Telefone</th><th>Cadastro</th><th>Perfil oficial</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div id="empty" class="empty">Nenhum parlamentar corresponde aos filtros selecionados.</div>
+      </div>
+      <div class="foot">
+        <span id="updatedAt">Aguardando consulta à API…</span>
+        <span>Fonte: <a href="https://dadosabertos.camara.leg.br/swagger/api.html" target="_blank" rel="noopener">Dados Abertos da Câmara</a></span>
+      </div>
+    </section>
+    <p class="legend">As fotografias são exibidas a partir do campo <code>urlFoto</code> fornecido pela própria Câmara. O link “Perfil oficial” abre a página institucional do parlamentar. Os números exibidos correspondem ao último status cadastral retornado pela API e podem mudar ao longo do tempo.</p>
+  </main>
+
+  <script>
+    // Lista de trabalho: nomes recebidos e consolidados nas mensagens anteriores.
+    // A UF é usada como critério adicional de correspondência, não como confirmação eleitoral.
+    const BASE = [
+      ["Afonso Motta","RS"], ["Alex Manente","SP"], ["Alexandre Leite","SP"], ["Alexandre Lindenmeyer","RS"],
+      ["Alfredinho","SP"], ["André Figueiredo","CE"], ["Antonio Carlos Rodrigues","SP"], ["Arthur Maia","BA"],
+      ["Átila Lins","AM"], ["Átila Lira","PI"], ["Bacelar","BA"], ["Benedita da Silva","RJ"],
+      ["Bruno Ganem","SP"], ["Cleber Verde","MA"], ["Daniel Trzeciak","RS"], ["Dimas Gadelha","RJ"],
+      ["Duarte Jr.","MA"], ["Eduardo Bismarck","CE"], ["Eduardo da Fonte","PE"], ["Erika Kokay","DF"],
+      ["Euclydes Pettersen","MG"], ["Fabio Macedo","MA"], ["Fabio Schiochet","SC"], ["Fabio Teruel","SP"],
+      ["Fernando Mineiro","RN"], ["Florentino Neto","PI"], ["Gilmar Machado","MG"], ["Gleisi Hoffmann","PR"],
+      ["Heitor Schuch","RS"], ["Helder Salomão","ES"], ["Henderson Pinto","PA"], ["Igor Timo","MG"],
+      ["Ismael dos Santos","SC"], ["José Airton","CE"], ["Keniston Braga","PA"], ["Lêda Borges","GO"],
+      ["Lídice da Mata","BA"], ["Lucas Ramos","PE"], ["Luiz Couto","PB"], ["Luiz Fernando Faria","MG"],
+      ["Luiz Gastão","CE"], ["Luiz Nishimori","PR"], ["Marangoni","SP"], ["Marina Silva","SP"],
+      ["Márcio Honaiser","MA"], ["Mário Heringer","MG"], ["Mauro Benevides Filho","CE"], ["Mendonça Filho","PE"],
+      ["Merlong Solano","PI"], ["Messias Donato","ES"], ["Mersinho Lucena","PB"], ["Milton Vieira","SP"],
+      ["Paulo Lemos","AP"], ["Paulo Magalhães","BA"], ["Paulo Pimenta","RS"], ["Paulo Teixeira","SP"],
+      ["Paulão","AL"], ["Patrus Ananias","MG"], ["Pedro Aihara","MG"], ["Reimont","RJ"],
+      ["Renildo Calheiros","PE"], ["Robinson Faria","RN"], ["Rogéria Santos","BA"], ["Romero Rodrigues","PB"],
+      ["Rosangela Gomes","RJ"], ["Rui Falcão","SP"], ["Sargento Portugal","RJ"], ["Silas Câmara","AM"],
+      ["Tadeu Veneri","PR"], ["Tarcísio Motta","RJ"], ["Túlio Gadêlha","PE"], ["Valdir Cobalchini","SC"],
+      ["Vander Loubet","MS"], ["Vitor Lippi","SP"], ["Waldenor Pereira","BA"], ["Welter","PR"],
+      ["Zé Neto","BA"], ["Zé Silva","MG"]
+    ].map(([name, uf]) => ({ name, uf, data: null, matched: false }));
+
+    // Variações conhecidas de nomes de tratamento usados pela imprensa ou na lista preliminar.
+    const ALIASES = {
+      "luiz fernando faria": ["luiz fernando", "luiz fernando faria"],
+      "mauro benevides filho": ["mauro benevides filho", "mauro benevides"],
+      "waldenor pereira": ["waldenor", "waldenor pereira"],
+      "fabio teruel": ["fábio teruel", "fabio teruel"],
+      "fabio schiochet": ["fábio schiochet", "fabio schiochet", "fabio schiochet filho"],
+      "duarte jr.": ["duarte jr", "duarte junior", "duarte"],
+      "lêda borges": ["leda borges", "lêda borges"],
+      "lídice da mata": ["lidice da mata", "lídice da mata"],
+      "paulão": ["paulao", "paulão"],
+      "zé neto": ["ze neto", "zé neto"],
+      "zé silva": ["ze silva", "zé silva"]
+    };
+
+    const API = "https://dadosabertos.camara.leg.br/api/v2";
+    const normalize = value => (value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const unique = arr => [...new Set(arr.filter(Boolean))];
+    let allDeputies = [];
+    let busy = false;
+
+    async function apiGet(path) {
+      const response = await fetch(`${API}${path}`, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error(`A API respondeu com status ${response.status}.`);
+      return response.json();
+    }
+
+    async function getAllLegislatureDeputies() {
+      const results = [];
+      for (let page = 1; page <= 10; page++) {
+        const payload = await apiGet(`/deputados?idLegislatura=57&itens=100&pagina=${page}&ordem=ASC&ordenarPor=nome`);
+        const items = payload.dados || [];
+        results.push(...items);
+        if (items.length < 100) break;
+      }
+      return results;
+    }
+
+    function nameCandidates(record) {
+      const key = normalize(record.name);
+      return unique([key, ...(ALIASES[key] || []).map(normalize)]);
+    }
+
+    function findApiMatch(record, deputies) {
+      const candidates = nameCandidates(record);
+      const matches = deputies.filter(d => {
+        const apiName = normalize(d.nome);
+        const ufOk = !d.siglaUf || d.siglaUf === record.uf;
+        return ufOk && candidates.includes(apiName);
+      });
+      if (matches.length === 1) return matches[0];
+      // Fallback conservador: aproximação por início do nome, somente quando UF também bate.
+      const soft = deputies.filter(d => {
+        const apiName = normalize(d.nome);
+        const ufOk = !d.siglaUf || d.siglaUf === record.uf;
+        return ufOk && candidates.some(c => c.length >= 7 && (apiName.startsWith(c) || c.startsWith(apiName)));
+      });
+      return soft.length === 1 ? soft[0] : null;
+    }
+
+    async function mapLimit(items, limit, fn) {
+      const out = new Array(items.length); let cursor = 0;
+      const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+        while (true) { const index = cursor++; if (index >= items.length) return; try { out[index] = await fn(items[index]); } catch (error) { out[index] = { __error: error.message }; } }
+      });
+      await Promise.all(workers); return out;
+    }
+
+    async function refreshData() {
+      if (busy) return;
+      busy = true;
+      const refresh = document.getElementById("refreshBtn");
+      const loading = document.getElementById("loading");
+      const errorBox = document.getElementById("errorBox");
+      refresh.disabled = true; refresh.textContent = "Atualizando…";
+      loading.style.display = "block"; errorBox.style.display = "none";
+      document.getElementById("rows").innerHTML = "";
+      try {
+        allDeputies = await getAllLegislatureDeputies();
+        const matches = BASE.map(record => ({ record, match: findApiMatch(record, allDeputies) }));
+        const detailResults = await mapLimit(matches, 6, async item => {
+          if (!item.match) return null;
+          return apiGet(`/deputados/${item.match.id}`);
+        });
+        matches.forEach((item, i) => {
+          const detail = detailResults[i]?.dados || null;
+          const status = detail?.ultimoStatus || null;
+          item.record.data = status ? {
+            id: detail.id,
+            name: status.nome || item.match.nome,
+            party: status.siglaPartido || item.match.siglaPartido || "",
+            uf: status.siglaUf || item.match.siglaUf || item.record.uf,
+            photo: status.urlFoto || item.match.urlFoto || "",
+            email: status.email || "",
+            cabinet: status.gabinete || null,
+            situation: status.situacao || "",
+            condition: status.condicaoEleitoral || ""
+          } : null;
+          item.record.matched = !!(status && status.gabinete);
+          item.record.apiId = item.match?.id || null;
+          item.record.lookupError = detailResults[i]?.__error || null;
+        });
+        const failed = detailResults.filter(x => x?.__error).length;
+        if (failed) showError(`${failed} consulta(s) individual(is) não puderam ser concluídas. Use “Atualizar dados” para tentar novamente.`);
+        document.getElementById("updatedAt").textContent = `Dados consultados em ${new Date().toLocaleString("pt-BR")}. Última situação retornada pela API.`;
+      } catch (error) {
+        showError(`Não foi possível acessar a API da Câmara neste momento. Verifique a conexão e tente novamente. Detalhe: ${error.message} Se estiver abrindo pelo arquivo local e o navegador bloquear a consulta, publique o index.html no GitHub Pages e abra o endereço publicado.`);
+        document.getElementById("updatedAt").textContent = "Consulta à API indisponível — os nomes da lista continuam disponíveis.";
+      } finally {
+        loading.style.display = "none"; refresh.disabled = false; refresh.textContent = "Atualizar dados"; busy = false;
+        populateFilters(); updateStats(); render();
+      }
+    }
+
+    function showError(message) { const box = document.getElementById("errorBox"); box.textContent = message; box.style.display = "block"; }
+    function initials(name) { return name.split(/\s+/).slice(0,2).map(x => x[0] || "").join("").toUpperCase(); }
+    function populateFilters() {
+      const select = document.getElementById("stateFilter");
+      const current = select.value;
+      const states = unique(BASE.map(x => x.uf)).sort();
+      select.innerHTML = '<option value="">Todas as UFs</option>' + states.map(uf => `<option value="${uf}">${uf}</option>`).join("");
+      select.value = current;
+    }
+    function cabinetText(data) {
+      if (!data?.cabinet) return '<span class="subline">Não informado</span>';
+      const c = data.cabinet;
+      const number = c.nome || c.sala || "—";
+      const annex = c.predio ? `Anexo ${c.predio}` : "Anexo não informado";
+      return `<span class="office">${esc(number)}</span><span class="subline">${esc(annex)}${c.andar ? ` · ${esc(c.andar)}º andar` : ""}</span>`;
+    }
+    function phoneText(data) {
+      const raw = data?.cabinet?.telefone;
+      if (!raw) return '<span class="contact">—</span>';
+      const digits = String(raw).replace(/\D/g, "");
+      const formatted = digits.length === 8 ? `${digits.slice(0,4)}-${digits.slice(4)}` : raw;
+      return `<a class="contact" href="tel:+5561${esc(digits)}" title="Ligar para o gabinete">${esc(formatted)}</a>`;
+    }
+    function render() {
+      const query = normalize(document.getElementById("search").value);
+      const uf = document.getElementById("stateFilter").value;
+      const status = document.getElementById("statusFilter").value;
+      const list = [...BASE].sort((a,b) => a.name.localeCompare(b.name, "pt-BR"));
+      const filtered = list.filter(r => {
+        const d = r.data || {};
+        const haystack = normalize([r.name, r.uf, d.party, d.name, d.cabinet?.nome, d.cabinet?.telefone].join(" "));
+        return (!query || haystack.includes(query)) && (!uf || r.uf === uf) && (status === "all" || (status === "found" ? r.matched : !r.matched));
+      });
+      const tbody = document.getElementById("rows");
+      tbody.innerHTML = filtered.map(r => {
+        const d = r.data;
+        const found = r.matched && d?.cabinet;
+        const photo = d?.photo;
+        const avatar = photo
+          ? `<img class="avatar" src="${esc(photo)}" alt="Foto oficial de ${esc(r.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=\'avatar avatar-fallback\'>${esc(initials(r.name))}</span>'">`
+          : `<span class="avatar avatar-fallback">${esc(initials(r.name))}</span>`;
+        const profile = r.apiId ? `https://www.camara.leg.br/deputados/${r.apiId}` : "https://www.camara.leg.br/deputados/";
+        return `<tr>
+          <td><div class="person">${avatar}<div><div class="person-name">${esc(r.name)}</div><div class="person-meta">${d?.name ? esc(d.name) : "Nome da lista preliminar"}</div></div></div></td>
+          <td><span class="uf">${esc(d?.uf || r.uf)}</span></td>
+          <td><span class="party">${esc(d?.party || "—")}</span></td>
+          <td>${cabinetText(d)}</td>
+          <td>${phoneText(d)}</td>
+          <td>${found ? '<span class="status"><span class="status-dot"></span>Localizado</span>' : '<span class="status pending"><span class="status-dot"></span>Pendente</span>'}</td>
+          <td><a class="profile" href="${profile}" target="_blank" rel="noopener">Abrir perfil ↗</a></td>
+        </tr>`;
+      }).join("");
+      document.getElementById("empty").style.display = filtered.length ? "none" : "block";
+      document.getElementById("totalCount").textContent = BASE.length;
+      document.getElementById("foundCount").textContent = BASE.filter(x => x.matched).length;
+      document.getElementById("pendingCount").textContent = BASE.filter(x => !x.matched).length;
+    }
+    function updateStats() { document.getElementById("totalCount").textContent = BASE.length; document.getElementById("foundCount").textContent = BASE.filter(x=>x.matched).length; document.getElementById("pendingCount").textContent = BASE.filter(x=>!x.matched).length; }
+    function exportCsv() {
+      const header = ["Nome da lista","UF da lista","Nome na Câmara","UF atual","Partido","Gabinete","Anexo","Andar","Telefone","Email","ID Câmara","Cadastro localizado"];
+      const rows = BASE.slice().sort((a,b)=>a.name.localeCompare(b.name,"pt-BR")).map(r => {
+        const d = r.data || {}, c = d.cabinet || {};
+        return [r.name,r.uf,d.name,d.uf,d.party,c.nome || c.sala,c.predio,c.andar,c.telefone,c.email,d.id,r.matched ? "Sim" : "Não"];
+      });
+      const csv = [header,...rows].map(row => row.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(";")).join("\r\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "consulta-gabinetes-camara.csv"; a.click(); URL.revokeObjectURL(url);
+    }
+    document.getElementById("search").addEventListener("input", render);
+    document.getElementById("stateFilter").addEventListener("change", render);
+    document.getElementById("statusFilter").addEventListener("change", render);
+    document.getElementById("refreshBtn").addEventListener("click", refreshData);
+    document.getElementById("csvBtn").addEventListener("click", exportCsv);
+    populateFilters(); updateStats(); render(); refreshData();
+  </script>
+</body>
+</html>
